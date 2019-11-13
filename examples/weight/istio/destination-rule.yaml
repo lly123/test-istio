@@ -1,0 +1,21 @@
+# https://istio.io/docs/reference/config/networking/v1alpha3/destination-rule/
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: destination-rule
+  namespace: test-istio
+spec:
+  host: my-ws
+  subsets:
+    - name: version-v1
+      labels:
+        version: v1
+      trafficPolicy:
+        loadBalancer:
+          simple: ROUND_ROBIN
+    - name: version-v2
+      labels:
+        version: v2
+      trafficPolicy:
+        loadBalancer:
+          simple: LEAST_CONN

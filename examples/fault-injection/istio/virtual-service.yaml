@@ -1,0 +1,28 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: virtual-service
+spec:
+  hosts:
+    - "www.test.com"
+  gateways:
+    - gateway
+  http:
+    - fault:
+        delay:
+          fixedDelay: 10s
+          percent: 100
+      match:
+        - headers:
+            is-delay:
+              exact: "true"
+      route:
+        - destination:
+            host: my-ws
+            port:
+              number: 8080
+    - route:
+      - destination:
+          host: my-ws
+          port:
+            number: 8080
