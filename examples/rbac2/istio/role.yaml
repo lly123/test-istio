@@ -1,0 +1,49 @@
+apiVersion: "rbac.istio.io/v1alpha1"
+kind: ServiceRole
+metadata:
+  name: service-role
+  namespace: test-istio
+spec:
+  rules:
+    - services: ["*"]
+      methods: ["GET"]
+      constraints:
+        - key: "destination.labels[app.kubernetes.io/name]"
+          values: ["simple-web-server"]
+---
+apiVersion: "rbac.istio.io/v1alpha1"
+kind: ServiceRoleBinding
+metadata:
+  name: service-role-binding
+  namespace: test-istio
+spec:
+  subjects:
+    - properties:
+        source.namespace: "istio-system"
+  roleRef:
+    kind: ServiceRole
+    name: "service-role"
+---
+apiVersion: "rbac.istio.io/v1alpha1"
+kind: ServiceRole
+metadata:
+  name: service-role-mysql
+  namespace: cn-mx
+spec:
+  rules:
+    - services: ["mysql.cn-mx.svc.cluster.local"]
+      constraints:
+        - key: "destination.port"
+          values: ["3306"]
+---
+apiVersion: "rbac.istio.io/v1alpha1"
+kind: ServiceRoleBinding
+metadata:
+  name: service-role-binding-mysql
+  namespace: cn-mx
+spec:
+  subjects:
+    - user: "cluster.local/ns/test-istio/sa/my-ws-sa"
+  roleRef:
+    kind: ServiceRole
+    name: "service-role-mysql"
